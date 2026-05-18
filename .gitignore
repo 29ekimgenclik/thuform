@@ -1,0 +1,20 @@
+node_modules/
+.next/
+out/
+.env
+.env.local
+.env*.local
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+.claude/
+
+# Local data store (Postgres'e geçince kullanılmıyor, sadece local dev için)
+data/submissions.json
+
+# Test çıktıları
+test-output.pdf
+pdf-test.bin
+cookies.txt
+env.txt
