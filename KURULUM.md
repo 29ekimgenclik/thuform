@@ -6,7 +6,7 @@
 2. Form, veritabanına `pending` olarak kaydedilir.
 3. Yetkili `/admin` üzerinden şifreyle giriş yapar.
 4. Listeden formu açar, PDF'i önizler, hocaya gönderilecek e-postayı hazırlar.
-5. "E-posta Gönder" tıklanınca PDF eklenmiş halde Resend üzerinden gönderilir.
+5. "E-posta Gönder" tıklanınca PDF eklenmiş halde Gmail SMTP üzerinden gönderilir.
 6. Gönderim sonrası form `sent` durumuna geçer.
 
 ## Yerel Geliştirme
@@ -19,7 +19,7 @@ npm run dev
 ```
 
 - `POSTGRES_URL` boşsa formlar lokal `data/submissions.json` dosyasına yazılır (sadece dev).
-- `RESEND_API_KEY` boşsa e-posta gönderim API'si 500 döner; admin panel diğer yönleriyle çalışır.
+- `GMAIL_USER` veya `GMAIL_APP_PASSWORD` boşsa e-posta gönderim API'si 500 döner; admin panel diğer yönleriyle çalışır.
 
 ## Vercel'e Deploy
 
@@ -39,10 +39,10 @@ git push -u origin main
 - Framework otomatik **Next.js** algılanır
 - Deploy edin
 
-### 3. Vercel Postgres ekleyin
+### 3. Neon Postgres ekleyin (Vercel Marketplace)
 
-- Proje sayfası → **Storage** → **Create** → **Postgres**
-- Veritabanı oluşturulup projeye bağlanır
+- Proje sayfası → **Storage** → **Marketplace Database Providers** → **Neon** → Connect
+- Region: Frankfurt seçin
 - `POSTGRES_URL` env değişkeni otomatik tanımlanır
 - "Redeploy" deyin ki yeni env yüklensin
 
@@ -50,18 +50,21 @@ git push -u origin main
 
 Settings → Environment Variables:
 
-| Değişken                  | Değer                                                              |
-| ------------------------- | ------------------------------------------------------------------ |
-| `ADMIN_PASSWORD`          | Admin paneli için güçlü bir şifre                                  |
-| `ADMIN_SESSION_SECRET`    | Rastgele 40+ karakter (örn. `openssl rand -hex 32` çıktısı)        |
-| `RESEND_API_KEY`          | resend.com'dan API key                                             |
-| `MAIL_FROM`               | `Tepebaşı Gençlik <onboarding@resend.dev>` veya doğrulanmış domain |
+| Değişken                  | Değer                                                          |
+| ------------------------- | -------------------------------------------------------------- |
+| `ADMIN_PASSWORD`          | Admin paneli için güçlü bir şifre                              |
+| `ADMIN_SESSION_SECRET`    | Rastgele 40+ karakter (örn. `openssl rand -hex 32` çıktısı)    |
+| `GMAIL_USER`              | Gönderen Gmail adresi (ör. `merkez@gmail.com`)                 |
+| `GMAIL_APP_PASSWORD`      | 16 haneli Gmail App Password (boşluksuz)                       |
+| `MAIL_FROM_NAME`          | (opsiyonel) Gönderende görünecek isim                          |
 
-### 5. Resend ayarı
+### 5. Gmail App Password üretme
 
-- resend.com hesabı açın, API key alın
-- Test için `onboarding@resend.dev` from adresi kullanılabilir (sadece kendi adresinize göndermenize izin verir)
-- Üretim için belediye domainini doğrulayın (`Domains` → `Add Domain`, DNS kayıtlarını ekleyin)
+1. Gmail hesabınızda 2FA (iki adımlı doğrulama) açık olmalı
+2. https://myaccount.google.com/apppasswords adresine gidin
+3. App: "Mail", Device: "Other (custom name)" → "Vercel THU" → Generate
+4. 16 haneli kodu (boşluksuz olarak) `GMAIL_APP_PASSWORD` env'sine yapıştırın
+5. Bu kod **bir defa görünür**, kaybederseniz yeni üretin
 
 ## Şifre Değiştirme
 

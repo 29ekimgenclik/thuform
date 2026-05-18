@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { isAuthenticated } from "@/lib/auth";
 import { getSubmission, markSent } from "@/lib/db";
 import { renderSubmissionPdf, pdfFilename } from "@/lib/pdf-server";
@@ -32,18 +32,21 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     );
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+  if (!gmailUser || !gmailPass) {
     return NextResponse.json(
       {
         ok: false,
-        error: "RESEND_API_KEY tanımlı değil. Vercel/Local env'ye ekleyin.",
+        error:
+          "GMAIL_USER veya GMAIL_APP_PASSWORD tanımlı değil. Vercel/Local env'ye ekleyin.",
       },
       { status: 500 },
     );
   }
 
-  const from = process.env.MAIL_FROM || "Tepebaşı Gençlik <onboarding@resend.dev>";
+  const fromName = process.env.MAIL_FROM_NAME || "Tepebaşı 29 Ekim Gençlik Merkezi";
+  const from = `"${fromName}" <${gmailUser}>`;
   const subject =
     parsed.data.subject ||
     `THU Sosyal Sorumluluk Sonuç Raporu — ${row.ogrenciAdSoyad}`;
@@ -65,29 +68,28 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
   try {
     const buffer = await renderSubmissionPdf(row);
-    const resend = new Resend(apiKey);
-    const result = await resend.emails.send({
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: { user: gmailUser, pass: gmailPass },
+    });
+    const info = await transporter.sendMail({
       from,
       to: parsed.data.to,
-      cc: parsed.data.cc ? [parsed.data.cc] : undefined,
+      cc: parsed.data.cc || undefined,
       subject,
       text,
       attachments: [
         {
           filename: pdfFilename(row),
           content: buffer,
+          contentType: "application/pdf",
         },
       ],
     });
-    if (result.error) {
-      console.error("Resend error:", result.error);
-      return NextResponse.json(
-        { ok: false, error: result.error.message || "Gönderim başarısız" },
-        { status: 502 },
-      );
-    }
     await markSent(id, parsed.data.to);
-    return NextResponse.json({ ok: true, messageId: result.data?.id });
+    return NextResponse.json({ ok: true, messageId: info.messageId });
   } catch (err: any) {
     console.error("send failed:", err);
     return NextResponse.json(
