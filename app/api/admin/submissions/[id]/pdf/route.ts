@@ -16,11 +16,14 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 
   try {
     const buffer = await renderSubmissionPdf(row);
+    const name = pdfFilename(row);
+    const ascii = name.replace(/[^\x20-\x7E]/g, "_");
+    const utf8 = encodeURIComponent(name);
     return new Response(new Uint8Array(buffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="${pdfFilename(row)}"`,
+        "Content-Disposition": `inline; filename="${ascii}"; filename*=UTF-8''${utf8}`,
         "Cache-Control": "no-store",
       },
     });
