@@ -4,11 +4,12 @@ import type { NextRequest } from "next/server";
 const COOKIE_NAME = "thu_admin";
 
 function getSecret(): string {
-  return (
-    process.env.ADMIN_SESSION_SECRET ||
-    process.env.ADMIN_PASSWORD ||
-    "dev-insecure-secret-change-me"
-  );
+  const env = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD;
+  if (env) return env;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("ADMIN_SESSION_SECRET (veya ADMIN_PASSWORD) ayarlanmalı");
+  }
+  return "dev-insecure-secret-change-me";
 }
 
 async function hmacHex(payload: string, secret: string): Promise<string> {

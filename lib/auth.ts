@@ -5,11 +5,12 @@ const COOKIE_NAME = "thu_admin";
 const MAX_AGE = 60 * 60 * 8; // 8 hours
 
 function getSecret(): string {
-  return (
-    process.env.ADMIN_SESSION_SECRET ||
-    process.env.ADMIN_PASSWORD ||
-    "dev-insecure-secret-change-me"
-  );
+  const env = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD;
+  if (env) return env;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("ADMIN_SESSION_SECRET (veya ADMIN_PASSWORD) ayarlanmalı");
+  }
+  return "dev-insecure-secret-change-me";
 }
 
 function sign(value: string): string {
@@ -37,7 +38,11 @@ export function verifySessionToken(token: string | undefined): boolean {
 }
 
 export function checkPassword(input: string): boolean {
-  const stored = process.env.ADMIN_PASSWORD || "tepebasi2025";
+  const stored = process.env.ADMIN_PASSWORD;
+  if (!stored) {
+    if (process.env.NODE_ENV === "production") return false;
+    return input === "tepebasi2025";
+  }
   if (input.length !== stored.length) return false;
   try {
     return timingSafeEqual(Buffer.from(input), Buffer.from(stored));
