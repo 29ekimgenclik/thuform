@@ -185,7 +185,10 @@ export default function AdminDetailPage({ params }: { params: { id: string } }) 
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="min-h-[120px] w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+              placeholder={
+                "Değerli Hocam merhaba,\nTepebaşı Belediyesi Gençlik Merkezi tarafından koordine edilen Sosyal Sorumluluk Programları; Gönüllülük Çalışmaları Dersi alan öğrencilerin de desteği ile devam ediyor, öncelikle Tepebaşı Belediyesi adına teşekkür ederiz. Gönüllülük Çalışmaları Dersi alan öğrencinizin etkinlik sonuç raporu ekte yer almaktadır. Saygılarımızla,\nTepebaşı Belediyesi Gençlik ve Spor Hizmetleri Müdürlüğü - 29 Ekim Gençlik Merkezi"
+              }
+              className="min-h-[160px] w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
             />
           </div>
         </div>

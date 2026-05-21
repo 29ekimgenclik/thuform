@@ -52,16 +52,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     `THU Sosyal Sorumluluk Sonuç Raporu — ${row.ogrenciAdSoyad}`;
 
   const defaultMessage = [
-    `Sayın ${row.ogretimUyesi || "Hocam"},`,
-    "",
-    "Tepebaşı Belediyesi 29 Ekim Gençlik Merkezi'nde gerçekleştirilen sosyal sorumluluk etkinliklerine ilişkin Topluma Hizmet Uygulamaları dersi sonuç raporu ekte yer almaktadır.",
-    "",
-    `Öğrenci: ${row.ogrenciAdSoyad}`,
-    `T.C./Öğrenci No: ${row.tcKimlik}`,
-    `Bölüm: ${row.okulFakulteBolum}`,
-    "",
-    "Saygılarımla,",
-    "Tepebaşı Belediyesi Gençlik ve Spor Hizmetleri Müdürlüğü",
+    "Değerli Hocam merhaba,",
+    "Tepebaşı Belediyesi Gençlik Merkezi tarafından koordine edilen Sosyal Sorumluluk Programları; Gönüllülük Çalışmaları Dersi alan öğrencilerin de desteği ile devam ediyor, öncelikle Tepebaşı Belediyesi adına teşekkür ederiz. Gönüllülük Çalışmaları Dersi alan öğrencinizin etkinlik sonuç raporu ekte yer almaktadır. Saygılarımızla,",
+    "Tepebaşı Belediyesi Gençlik ve Spor Hizmetleri Müdürlüğü - 29 Ekim Gençlik Merkezi",
   ].join("\n");
 
   const text = parsed.data.message || defaultMessage;
